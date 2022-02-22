@@ -12,6 +12,7 @@ stages:
     displayName: 'Build job'
     pool:
       vmImage: 'ubuntu-20.04'
+      demands: npm
 
     variables:
       wwwrootDir: 'Tailspin.SpaceGame.Web/wwwroot'
@@ -22,6 +23,14 @@ stages:
       displayName: 'Use .NET SDK $(dotnetSdkVersion)'
       inputs:
         version: '$(dotnetSdkVersion)'
+      
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '14.x'
+    - task: Npm@1
+      displayName: 'Run npm install'
+      inputs:
+        verbose: false
 
     - script: './node_modules/.bin/node-sass $(wwwrootDir) --output $(wwwrootDir)'
       displayName: 'Compile Sass assets'
@@ -77,6 +86,6 @@ stages:
           - task: AzureWebApp@1
             displayName: 'Azure App Service Deploy: website'
             inputs:
-              azureSubscription: 'webapp-deployment'
+              azureSubscription: 'wbeapp-deployment'
               appName: '$(WebAppName)'
               package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*.zip'
